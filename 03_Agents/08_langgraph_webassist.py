@@ -54,7 +54,7 @@ HTML:
 {html[:12000]}
 """
     resp = await llm.ainvoke(prompt)
-    return resp.content.strip()
+    return resp.content[0]['text'].strip()
 
 # ---------------------------------------------------------------------
 # Agents
@@ -84,7 +84,7 @@ nfl
 both
 """
     resp = await llm.ainvoke(prompt)
-    decision = resp.content.lower().strip()
+    decision = resp.content[0]['text'].lower().strip()
 
     if decision == "nba":
         return Send("nba", state)

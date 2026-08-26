@@ -1,16 +1,9 @@
 from langchain_chroma import Chroma
-# from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_google_vertexai import VertexAIEmbeddings
-
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import readline
-import os
 
 vectorstore = Chroma(
-    embedding_function=VertexAIEmbeddings(
-        model_name="gemini-embedding-001",
-        project=os.getenv("GOOGLE_CLOUD_PROJECT"),
-        location="us-west1"
-    ),
+    embedding_function=GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", task_type="retrieval_query"),
     persist_directory="./rag_data/.chromadb"
 )
 
@@ -18,13 +11,12 @@ def search_db(query):
     docs = vectorstore.similarity_search(query)
     print(f"Query database for: {query}")
     if docs:
-        print(f"Closest document match in database: {docs[0].metadata['source']}, count={len(docs)}")
+        print(f"Closest document match in database: {docs[0].metadata['source']}")
     else:
         print("No matching documents")
 
 print("RAG database initialized.")
 retriever = vectorstore.as_retriever()
-
 document_data_sources = set()
 for doc_metadata in retriever.vectorstore.get()['metadatas']:
     document_data_sources.add(doc_metadata['source']) 
@@ -35,6 +27,6 @@ print("This program queries documents in the RAG database that are similar to wh
 while True:
     line = input(">> ")
     if line:
-            search_db(line)
+        search_db(line)
     else:
         break

@@ -17,3 +17,5 @@ openai
 langgraph
 langchain-anthropic
 httpx
+mypy_extensions
+IPython

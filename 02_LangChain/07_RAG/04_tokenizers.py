@@ -24,7 +24,7 @@ def print_tokens(tokens):
 
 print("Enter a text query to see how it is tokenized")
 while True:
-    line = input(">> ")
+    line = input(">> "w)
     if line:
         tokenize_compare(line)
     else:

@@ -43,6 +43,7 @@ def pretty_print_history(messages):
     print("  =======")
     for i, msg in enumerate(messages, start=1):
         role = "User" if msg.type == "human" else ("Assistant" if msg.type == "ai" else "System")
+        # msg is either a HumanMessage or AIMessage
         print(f"  {i}. {role}: {msg.content}")
     print("  =======")
 
@@ -51,11 +52,12 @@ print("Welcome to the Generative Security chat application. A blank line exits."
 while True:
     content = input(">> ")
     if content:
-        response = chat_chain.invoke({"input": content}, config={"configurable": {"session_id": session_id}})
-        print(response.content)
+        response = chat_chain.invoke({"input": content}, 
+                        config={"configurable": {"session_id": session_id}})
+        print("RESPONSE:", response.content[0]['text'])
 
         # Print the history from the retained instance
         pretty_print_history(message_history.messages)
+        print("  =======")
     else:
         break
-

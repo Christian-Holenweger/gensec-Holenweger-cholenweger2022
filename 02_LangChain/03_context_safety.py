@@ -28,6 +28,6 @@ while True:
     content = input(">> ")
     if content:
         result = summarize_url(content)
-        print(result.content)
+        print(result.content[0]['text'])
     else:
         break

@@ -4,6 +4,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_MODEL"))
 #from langchain_openai import ChatOpenAI
 #llm = ChatOpenAI(model=os.getenv("OPENAI_MODEL"))

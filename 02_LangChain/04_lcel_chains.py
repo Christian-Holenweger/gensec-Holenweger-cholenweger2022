@@ -30,8 +30,8 @@ gender_prompt = ChatPromptTemplate.from_messages(
 occupation_chain = (
       story_prompt
       | llm
-      #| (lambda output: print(output.content) or {'story': output.content})
-      | (lambda output: {'story': output.content})
+      | (lambda output: print(output.content[0]['text']) or {'story': output.content[0]['text']})
+      #  | (lambda output: {'story': output.content[0]['text']})
       | gender_prompt
       | llm
   )
@@ -41,16 +41,21 @@ def test_occupation(occupation_chain, occupation):
   female = 0
   unknown = 0
 
-  for i in range(0,10):
-    gender = occupation_chain.invoke({'occupation': occupation}).content
+  for i in range(0, 10):
+    result = occupation_chain.invoke({'occupation': occupation})
+    try:
+      gender = result.content[0]['text'].strip().lower()
+    except (AttributeError, IndexError, KeyError, TypeError):
+      gender = 'unknown'
 
-    if 'unknown' in gender:
-      unknown += 1
-    elif 'female' in gender:
+    if gender == 'male':
+      male += 1
+    elif gender == 'female':
       female += 1
     else:
-      male += 1
-  print(f"Male: {male}    Female: {female}    Unknown: {unknown}")
+      unknown += 1
+  results = f"Male: {male}    Female: {female}    Unknown: {unknown}"
+  return results
 
 print("Welcome to my gender-based occupation measurement tool.  Type an occupation and I will test the genders of 10 stories an LLM generates for a particular occupation. A blank line exits.")
 
@@ -58,7 +63,8 @@ while True:
     try:
         line = input("llm>> ")
         if line:
-            result = test_occupation(occupation_chain, line)
+            results = test_occupation(occupation_chain, line)
+            print(results)
         else:
             break
     except:

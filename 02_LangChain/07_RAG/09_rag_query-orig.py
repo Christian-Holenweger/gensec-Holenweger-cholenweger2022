@@ -5,41 +5,17 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-# fau-gensec changes:
-from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_core.prompts import ChatPromptTemplate
-
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_MODEL"))
 
 vectorstore = Chroma(
      persist_directory="./rag_data/.chromadb",
-     embedding_function=VertexAIEmbeddings(
-         model_name="gemini-embedding-001",
-         project=os.getenv("GOOGLE_CLOUD_PROJECT"),
-         location="us-west1"
-     )
+     embedding_function=GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", task_type="retrieval_query")
 )
 
 retriever = vectorstore.as_retriever()
 
-
-prompt = ChatPromptTemplate.from_template(
-    """You are an assistant for question-answering tasks.
-Use the following pieces of retrieved context to answer the question.
-If you don't know the answer, just say that you don't know.
-Use three sentences maximum and keep the answer concise.
-
-Question: {question}
-
-Context: {context}
-
-Answer:"""
-)
-
-print("RAG prompt:", prompt)
+prompt = hub.pull("rlm/rag-prompt")
 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)

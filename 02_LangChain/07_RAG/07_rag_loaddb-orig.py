@@ -1,75 +1,33 @@
-import os
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# we use a custom WikipediaLoader class that uses rate limiting to avoid being blocked by Wikipedia's servers and a valid user agent string to avoid being blocked by Wikipedia's servers.
-# from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoader, TextLoader, PyPDFDirectoryLoader, Docx2txtLoader, UnstructuredMarkdownLoader, WikipediaLoader, ArxivLoader, CSVLoader, GithubFileLoader
-from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoader, TextLoader, PyPDFDirectoryLoader, Docx2txtLoader, UnstructuredMarkdownLoader, ArxivLoader, CSVLoader, GithubFileLoader
-
+from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoader, TextLoader, PyPDFDirectoryLoader, Docx2txtLoader, UnstructuredMarkdownLoader, WikipediaLoader, ArxivLoader, CSVLoader, GithubFileLoader
 from langchain_core.documents import Document
 from youtube_transcript_api import YouTubeTranscriptApi
 from langchain_chroma import Chroma
-
-
-# we use Vertex AI embeddings instead of Google Generative AI embeddings because Vertex AI actually uses the Educational Credit
-#from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_google_vertexai import VertexAIEmbeddings
-
-# custom Wikipedia:
-from wikipedia_loader import WikipediaLoader
-
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import readline
 
-
-# IMPORTANT NOTES:
-# Vertex AI uses your GCP Project ID rather than an AI Studio API key. 
-# Computing embeddings is token-heavy.
-# 
-# langchain_community is not supported and is out of date. 
-# Arxiv loader fails with exception AttributeError: 'Search' object has no attribute 'results'.
-#
-# Github loader requires a GitHub personal access token to work. 
-# You can set it as an environment variable GITHUB_PERSONAL_ACCESS_TOKEN or pass it as a 
-# parameter to the GithubFileLoader constructor.
-
-embedding_function = VertexAIEmbeddings(
-    model_name="gemini-embedding-001",
-    project=os.getenv("GOOGLE_CLOUD_PROJECT"),
-    location="us-west1"
-)
-
-# original code using Google AI studio:
-    # vectorstore = Chroma(
-    #    embedding_function=GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", task_type="retrieval_query"),
-    #    persist_directory="./rag_data/.chromadb"
-    #)
-
 vectorstore = Chroma(
-    embedding_function=embedding_function,
+    embedding_function=GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", task_type="retrieval_query"),
     persist_directory="./rag_data/.chromadb"
 )
-
 
 def load_docs(docs):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=10)
     splits = text_splitter.split_documents(docs)
-    vectorstore.add_documents(documents=splits)
+
+    print(f"# splits: {len(splits)}, split0: {len(splits[0].page_content)} chars")
+
+#    vectorstore.add_documents(documents=splits)
+    vectorstore.add_documents(documents=[splits[0]])
 
 def load_urls(urls):
     load_docs(AsyncHtmlLoader(urls).load())
 
 def load_wikipedia(query):
-    wl = WikipediaLoader(query=query, load_max_docs=2)
-    docs = wl.load() 
-
-    # load_docs(WikipediaLoader(query=query, load_max_docs=1).load())
-    load_docs(docs)
+    load_docs(WikipediaLoader(query=query, load_max_docs=1).load())
 
 def load_arxiv(query):
-    al = ArxivLoader(query=query, load_max_docs=1)
-
-    # next line fails with exception AttributeError: 'Search' object has no attribute 'results'
-    docs = al.load()
+    docs = ArxivLoader(query=query, load_max_docs=1).load()
     docs[0].metadata['source'] = f"arxiv:{query}"
     load_docs(docs)
 
@@ -105,19 +63,17 @@ def load_md(directory):
 def load_csv(directory):
     load_docs(DirectoryLoader(directory, glob="**/*.csv", loader_cls=CSVLoader).load())
 
-#urls = ["https://www.pdx.edu/academics/programs/undergraduate/computer-science", "https://www.pdx.edu/computer-science/"]
-#print(f"Loading: {urls}")
-#load_urls(urls)
+urls = ["https://www.pdx.edu/academics/programs/undergraduate/computer-science", "https://www.pdx.edu/computer-science/"]
+print(f"Loading: {urls}")
+load_urls(urls)
 
 wiki_query = "LangChain"
 print(f"Loading Wikipedia pages on: {wiki_query}")
 load_wikipedia(wiki_query)
 
 arxiv_query = "2310.03714"
-
-# next lines fail with exception AttributeError: 'Search' object has no attribute 'results'
-#print(f"Loading arxiv document: {arxiv_query}")
-#load_arxiv(arxiv_query)
+print(f"Loading arxiv document: {arxiv_query}")
+load_arxiv(arxiv_query)
 
 github_file = "butcher.py"
 print(f"Loading github file(s) with ending: {github_file}")

@@ -3,7 +3,9 @@ import time
 from langchain_community.document_loaders import AsyncHtmlLoader
 from langchain_community.document_transformers import BeautifulSoupTransformer
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_MODEL"),temperature=0)
+
 #from langchain_openai import ChatOpenAI
 #llm = ChatOpenAI(model=os.getenv("OPENAI_MODEL"))
 #from langchain_anthropic import ChatAnthropic

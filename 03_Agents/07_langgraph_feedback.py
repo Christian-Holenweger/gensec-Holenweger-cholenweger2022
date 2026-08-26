@@ -41,6 +41,7 @@ llm = ChatGoogleGenerativeAI(
         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE
     },
 ).bind_tools(tools)
+
 #from langchain_anthropic import ChatAnthropic                                  
 #llm = ChatAnthropic(model=os.getenv("ANTHROPIC_MODEL")).bind_tools(tools)      
 #from langchain_openai import ChatOpenAI                                        
