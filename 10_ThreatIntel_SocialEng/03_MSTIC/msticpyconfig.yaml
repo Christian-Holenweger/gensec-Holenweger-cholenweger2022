@@ -1,7 +1,0 @@
-TIProviders:
-  VirusTotal:
-    Args:
-      AuthKey:
-        EnvironmentVar: "VIRUSTOTAL_API_KEY"
-    Primary: True
-    Provider: "VirusTotal"

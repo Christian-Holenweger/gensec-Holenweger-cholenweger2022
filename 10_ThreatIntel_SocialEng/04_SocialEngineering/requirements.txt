@@ -1,5 +1,0 @@
-requests
-langchain
-langchain-community
-langchain_google_genai
-langchainhub
