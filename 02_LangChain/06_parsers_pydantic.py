@@ -28,7 +28,9 @@ json_prompt = PromptTemplate(
     partial_variables={"format_instructions": json_parser.get_format_instructions()},
 )
 
-print(f"This program lists the top 5 movies of a particular genre in a JSON format.  The format instructions given to the LLM from the parser are:\n {json_parser.get_format_instructions()}")
+print(f"This program lists the top 5 movies of a particular genre in a JSON format.\n"
+      f"The format instructions given to the LLM from the parser are:\n"
+      f"{json_parser.get_format_instructions()}")
 
 chain = json_prompt | llm | json_parser
 
