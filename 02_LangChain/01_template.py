@@ -2,6 +2,8 @@ import os
 import readline
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
+
+# Configure the default chat model from the environment.
 llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_MODEL"))
 #from langchain_openai import ChatOpenAI
 #llm = ChatOpenAI(model=os.getenv("OPENAI_MODEL"))
@@ -10,6 +12,7 @@ llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_MODEL"))
 #from langchain_xai import ChatXAI
 #llm = ChatXAI(model=os.getenv("XAI_MODEL"))
 
+# Write a few-shot prompt that shows the two allowed classifications.
 prompt_template = """Classify the following e-mail snippet as either Malicious or Benign.
 Some examples include:
 
@@ -22,7 +25,7 @@ Answer: Benign
 Message: {message}
 Answer: """
 
-# create a prompt example from above template
+# Turn the template into a reusable LangChain prompt object.
 spam_detect_prompt = PromptTemplate(
     input_variables=["message"],
     template=prompt_template
@@ -35,7 +38,13 @@ print("Welcome to my spam detector.  Type an e-mail subject line and I will tell
 while True:
     line = input("llm>> ")
     if line:
+        # Fill in the user's message, send it to the model, and print the label.
         result = llm.invoke(spam_detect_prompt.format(message=line))
-        print(result)
+
+        # original code used just result.content, but the new version of the LLM returns a list
+        # of dicts with a 'text' key:
+        # original:
+        #      print(result.content)
+        print(result.content[0]['text'])
     else:
         break
