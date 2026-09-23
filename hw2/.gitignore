@@ -1,0 +1,14 @@
+# Keep homework setup files trackable despite repository-wide ignore rules.
+!.gitignore
+!pyproject.toml
+!README.md
+!uv.lock
+
+# Local environments, databases, credentials, and generated files.
+.venv/
+rag_data/.chromadb/
+.env
+credentials.json
+token.json
+__pycache__/
+*.py[cod]

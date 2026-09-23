@@ -1,0 +1,16 @@
+[project]
+name = "security-study-notebook"
+version = "0.1.0"
+description = "Homework 2 Security Study Notebook"
+requires-python = ">=3.11"
+dependencies = [
+    "chainlit",
+    "langchain-chroma",
+    "langchain-community",
+    "langchain-core",
+    "langchain-google-genai",
+    "langchain-google-vertexai",
+    "langchain-text-splitters",
+    "pypdf",
+    "unstructured[md]",
+]
