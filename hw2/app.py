@@ -7,7 +7,6 @@ import chainlit as cl
 from langchain_chroma import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_vertexai import VertexAIEmbeddings
 
@@ -55,20 +54,27 @@ def format_docs(docs):
 
 
 def create_rag_chain():
-    """Build the retrieval-augmented question-answering chain."""
+    """Build the retriever and answer-generation chain."""
     vectorstore = create_vectorstore()
     retriever = vectorstore.as_retriever()
     llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_MODEL"))
 
-    return (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | create_prompt()
-        | llm
-        | StrOutputParser()
-    )
+    answer_chain = create_prompt() | llm | StrOutputParser()
+    return retriever, answer_chain
 
 
-rag_chain = create_rag_chain()
+retriever, answer_chain = create_rag_chain()
+
+
+def format_sources(docs):
+    """Return unique source names from document metadata, if available."""
+    sources = []
+    for doc in docs:
+        metadata = doc.metadata or {}
+        source = metadata.get("source") or metadata.get("file_path")
+        if source and source not in sources:
+            sources.append(source)
+    return sources
 
 
 @cl.on_chat_start
@@ -90,9 +96,17 @@ async def on_chat_start():
 
 @cl.on_message
 async def on_message(message: cl.Message):
-    """Answer a user message with the RAG chain."""
-    answer = rag_chain.invoke(message.content)
-    await cl.Message(content=answer).send()
+    """Answer a question and show the retrieved documents as sources."""
+    docs = retriever.invoke(message.content)
+    answer = answer_chain.invoke(
+        {"question": message.content, "context": format_docs(docs)}
+    )
+    sources = format_sources(docs)
+    source_text = "\n".join(f"- {source}" for source in sources)
+    if not source_text:
+        source_text = "- Source metadata unavailable"
+
+    await cl.Message(content=f"{answer}\n\n**Sources**\n{source_text}").send()
 
 
 if __name__ == "__main__":
