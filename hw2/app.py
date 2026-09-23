@@ -10,13 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_vertexai import VertexAIEmbeddings
 
-CHROMA_PERSIST_DIRECTORY = (
-    Path(__file__).resolve().parent.parent
-    / "02_LangChain"
-    / "07_RAG"
-    / "rag_data"
-    / ".chromadb"
-)
+CHROMA_PERSIST_DIRECTORY = Path(__file__).resolve().parent / "rag_data" / ".chromadb"
 
 
 def create_vectorstore():
