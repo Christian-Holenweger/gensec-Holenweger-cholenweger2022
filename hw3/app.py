@@ -2,6 +2,7 @@
 
 import os
 import json
+import string
 from urllib.parse import parse_qs, urlsplit
 
 from langchain_core.tools import tool
@@ -44,14 +45,66 @@ def analyze_url(url: str) -> str:
     return json.dumps(details, indent=2)
 
 
+@tool
+def analyze_password_strength(password: str) -> str:
+    """Rate password characteristics and suggest ways to improve them.
+
+    The password is analyzed in memory only and is not stored or logged.
+    """
+    length = len(password)
+    has_uppercase = any(char.isupper() for char in password)
+    has_lowercase = any(char.islower() for char in password)
+    has_number = any(char.isdigit() for char in password)
+    has_special = any(char in string.punctuation for char in password)
+
+    # A straightforward score combines length with character variety.
+    score = sum((has_uppercase, has_lowercase, has_number, has_special))
+    if length >= 12:
+        score += 1
+    if length >= 16:
+        score += 1
+
+    if length < 8 or score <= 2:
+        rating = "Weak"
+    elif length >= 12 and score >= 5:
+        rating = "Strong"
+    else:
+        rating = "Moderate"
+
+    recommendations = []
+    if length < 12:
+        recommendations.append("Use at least 12 characters; a longer passphrase is even better.")
+    if not has_uppercase:
+        recommendations.append("Add uppercase letters.")
+    if not has_lowercase:
+        recommendations.append("Add lowercase letters.")
+    if not has_number:
+        recommendations.append("Include numbers.")
+    if not has_special:
+        recommendations.append("Include special characters.")
+    if not recommendations:
+        recommendations.append("Keep it unique to this account and consider using a password manager.")
+
+    details = {
+        "strength": rating,
+        "length": length,
+        "has_uppercase": has_uppercase,
+        "has_lowercase": has_lowercase,
+        "has_numbers": has_number,
+        "has_special_characters": has_special,
+        "recommendations": recommendations,
+    }
+    return json.dumps(details, indent=2)
+
+
 def create_agent():
-    """Create a Gemini agent with URL analysis and Python REPL tools."""
+    """Create a Gemini agent with URL, password, and Python tools."""
     model_name = os.getenv("GOOGLE_MODEL")
     if not model_name:
         raise ValueError("Set the GOOGLE_MODEL environment variable to a Gemini model name.")
 
     llm = ChatGoogleGenerativeAI(model=model_name)
-    tools = [analyze_url, PythonREPLTool()]
+    tools = [analyze_url, analyze_password_strength, PythonREPLTool()]
     return create_react_agent(llm, tools)
 
 
