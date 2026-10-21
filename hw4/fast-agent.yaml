@@ -1,0 +1,13 @@
+# FastAgent starts each server as a local subprocess and communicates over stdio.
+mcp:
+  servers:
+    security_logs:
+      transport: stdio
+      command: uv
+      args: [run, python, mcp-server.py]
+      cwd: .
+    git_history:
+      transport: stdio
+      command: uv
+      args: [run, python, -m, mcp_server_git, --repository, /home/cholenweger2022/gensec-code]
+      cwd: .
