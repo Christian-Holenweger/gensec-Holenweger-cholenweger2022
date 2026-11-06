@@ -62,4 +62,22 @@ Run a compatibility test if possible and explain the results.
 
 Prompt 3:
 
+Test the security and functionality of the existing Secure Password Manager in app.py.
+
+Requirements:
+1. Create a Python test file named test_app.py using unittest.
+2. Test that weak master passwords such as "123", "password", and "admin123" are rejected.
+3. Test that master passwords shorter than 12 characters are rejected.
+4. Test that valid master passwords are accepted.
+5. Test that incorrect master passwords cannot unlock the vault and that access is denied after 3 failed attempts.
+6. Test that empty account names and usernames are rejected.
+7. Test that account names and usernames longer than 100 characters are rejected.
+8. Test SQL injection-style inputs such as ' OR '1'='1 and confirm that the database is not compromised.
+9. Test that passwords are encrypted in SQLite rather than stored as plaintext.
+10. Test that adding, listing, retrieving, deleting, and generating passwords works correctly.
+11. Use temporary test databases and dummy credentials only. Do not modify or delete the existing passwords.db.
+12. Run the tests, fix any problems discovered, and summarize the results.
+13. Keep the code simple, beginner-friendly, and only modify files inside hw6.
+
+Explain which security tests passed, which failed, and any remaining limitations.
 
