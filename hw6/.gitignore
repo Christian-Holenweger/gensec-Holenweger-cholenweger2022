@@ -1,0 +1,16 @@
+# Local password vault and SQLite temporary files
+passwords.db
+passwords.db-*
+*.sqlite
+*.sqlite3
+
+# Local secrets and key material
+.env
+.env.*
+*.key
+*.pem
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+.venv/

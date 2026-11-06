@@ -1,0 +1,20 @@
+Prompt 1:
+
+Create a simple, secure Python command-line application called Secure Password Manager.
+
+Requirements:
+1. Write the application in app.py using Python 3.
+2. Use SQLite to store account names, usernames, and encrypted passwords.
+3. Use the cryptography library with Fernet encryption.
+4. Require a master password to unlock the password manager. Derive the encryption key from the master password using Scrypt with a randomly generated salt. Never store the master password or encryption key.
+5. Provide a menu to add credentials, list accounts, retrieve passwords, delete credentials, and generate strong random passwords.
+6. Use the secrets module to generate passwords securely.
+7. Use parameterized SQL queries to prevent SQL injection.
+8. Use getpass to hide master password input.
+9. Handle incorrect master passwords and invalid user input without crashing.
+10. Keep the code simple, readable, and beginner-friendly with comments explaining the main functions.
+11. Only create or modify files inside the hw6 directory. Do not change files from previous assignments.
+12. Do not create real credentials or commit the database. Add a .gitignore inside hw6 to exclude the database, local secrets, and Python cache files.
+
+Implement the application and explain how to run it.
+
