@@ -18,3 +18,48 @@ Requirements:
 
 Implement the application and explain how to run it.
 
+Prompt 2:
+
+Improve the security of the existing Secure Password Manager in app.py.
+
+Requirements:
+1. Require new master passwords to be at least 12 characters long and reject common weak passwords such as 123, password, and admin123.
+2. Validate account names and usernames. Reject empty inputs and limit their lengths to prevent excessively large input.
+3. Ensure all SQLite queries use parameterized SQL statements to prevent SQL injection.
+4. Handle unexpected input, invalid menu selections, and corrupted encrypted data without crashing.
+5. Do not display or log the master password or encryption keys.
+6. Limit failed master password attempts to 3 per application run and exit after the third failure.
+7. Preserve the existing encrypted database format and functionality. Do not delete or reset existing credentials.
+8. Keep the code simple, readable, and beginner-friendly.
+9. Only modify files inside hw6. Do not change previous assignments or any real credentials.
+
+After making the changes, explain which security vulnerabilities were addressed and how I can test them.
+
+Prompt 2 (follow-up) (Data Compatibility) :
+
+I noticed that your security improvements changed the SQLite database schema from the original application.
+
+The original app.py used:
+- A settings table with columns name and value.
+- A credentials table with a column named encrypted_password.
+
+The updated app.py uses:
+- A settings table with columns id, salt, and verification.
+- A credentials table with a column named password.
+
+This violates my previous requirement to preserve the existing encrypted database format.
+
+Please correct app.py so that:
+
+1. It remains compatible with databases created by the original application.
+2. Existing encrypted credentials can still be unlocked and retrieved using the original master password.
+3. All security improvements from Prompt 2 remain in place.
+4. No existing passwords.db file is deleted, reset, or modified unnecessarily.
+5. Any compatibility testing uses temporary databases and dummy credentials only.
+6. Only files inside hw6 are modified.
+
+Run a compatibility test if possible and explain the results.
+
+Prompt 3:
+
+
